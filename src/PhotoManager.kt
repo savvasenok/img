@@ -1,22 +1,23 @@
 package xyz.savvamirzoyan.img
 
 import java.io.File
+import kotlin.reflect.KFunction1
 
 object PhotoManager {
-    fun getAllPhotosPaths(): ArrayList<String> {
-        val photos = arrayListOf<String>()
-        File(Config.imagePath).walk().forEach { if (it.isFile) photos.add(it.absolutePath) }
-        return photos
+    fun getAllPhotosPaths(): Sequence<String> {
+        return mapFiles(File::getAbsolutePath)
     }
 
-    fun getAllPhotosNames(): ArrayList<String> {
-        val photos = arrayListOf<String>()
-        File(Config.imagePath).walk().forEach { if (it.isFile) photos.add(it.name) }
-        return photos
+    fun getAllPhotosNames(): Sequence<String> {
+        return mapFiles(File::getName)
     }
 
-    fun getAllPhotosLinks(): ArrayList<String> {
-        return ArrayList(getAllPhotosNames().map { "${Config.prefix}$it" })
+    fun mapFiles(prop: KFunction1<File, String>): Sequence<String> {
+        return File(Config.imagePath).walk().mapNotNull { if (it.isFile) prop.call(it) else null }
+    }
+
+    fun getAllPhotosLinks(): Sequence<String> {
+        return getAllPhotosNames().map { "${Config.prefix}$it" }
     }
 
     fun createRandomString(): String {
@@ -30,7 +31,7 @@ object PhotoManager {
         val photosPaths = this.getAllPhotosPaths()
         var url = Config.prefix + newPhoto.name
 
-        mainLoop@ for (i in photosPaths) {
+        for (i in photosPaths) {
             val file = File(i)
 
             if (file.exists()) {
@@ -40,7 +41,7 @@ object PhotoManager {
                     newPhoto.delete()
                     url = Config.prefix + file.name
 
-                    break@mainLoop
+                    break
                 }
             }
         }

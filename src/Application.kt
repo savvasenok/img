@@ -42,7 +42,7 @@ fun Application.module() {
 
         get("/info") {
             call.respond(
-                mapOf<String, ArrayList<String>>(
+                mapOf(
                     "getAllPhotosPaths" to PhotoManager.getAllPhotosPaths(),
                     "getAllPhotosNames" to PhotoManager.getAllPhotosNames(),
                     "getAllPhotosLinks" to PhotoManager.getAllPhotosLinks()
@@ -52,7 +52,7 @@ fun Application.module() {
 
         get("/test") {
             call.respond(
-                mapOf<String, Any>(
+                mapOf(
                     "OK" to true,
                     "links" to PhotoManager.getAllPhotosLinks()
                 )
@@ -85,9 +85,7 @@ fun Application.module() {
 
                             urls.add(PhotoManager.findAndDeleteIdenticalPhoto(file))
                         }
-
-                        else -> {
-                        }
+                        else -> {}
                     }
                     part.dispose()
                 }
